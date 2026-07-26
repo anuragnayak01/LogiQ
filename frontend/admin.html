@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manifest — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9; --surface: #fff; --border: #e7e9ec;
+    --ink: #14161a; --ink-muted: #6b7280;
+    --mint: #e2f5ec; --green: #1c6b52; --green-dark: #12503c;
+    --red: #c94f3f; --red-bg: #fbe6e2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    display: flex; justify-content: center; padding: 60px 20px;
+  }
+  .wrap { width: 100%; max-width: 560px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  p.sub { color: var(--ink-muted); font-size: 14.5px; margin: 0 0 28px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 18px;
+  }
+  label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 8px; }
+  input[type="text"], input[type="password"] {
+    width: 100%; padding: 11px 14px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: 14px; font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 14px;
+  }
+  input:focus-visible { outline: 2px solid var(--green); outline-offset: 1px; }
+  button {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 14px;
+    background: var(--green); color: #fff; border: none; border-radius: 8px;
+    padding: 12px 20px; cursor: pointer; width: 100%;
+  }
+  button:hover { background: var(--green-dark); }
+  button:disabled { background: var(--border); color: var(--ink-muted); cursor: not-allowed; }
+  .result {
+    margin-top: 16px; padding: 14px 16px; border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;
+    white-space: pre-wrap; word-break: break-word; display: none;
+  }
+  .result.ok { background: var(--mint); color: var(--green-dark); display: block; }
+  .result.err { background: var(--red-bg); color: var(--red); display: block; }
+  .step { font-size: 13px; color: var(--ink-muted); margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Manifest — Admin</h1>
+  <p class="sub">Load documents into the knowledge base. Nothing here is public — you need your Admin Key to do anything.</p>
+
+  <div class="card">
+    <label for="apiBase">Your backend URL</label>
+    <input type="text" id="apiBase" placeholder="https://logiq-nr7d.onrender.com" value="https://logiq-nr7d.onrender.com" />
+
+    <label for="adminKey">Admin Key</label>
+    <input type="password" id="adminKey" placeholder="Paste your ADMIN_API_KEY here" />
+
+    <button id="seedBtn">Load the 3 sample documents</button>
+    <div class="result" id="seedResult"></div>
+  </div>
+
+  <div class="card">
+    <div class="step">Check what's currently in the knowledge base:</div>
+    <button id="listBtn">List documents</button>
+    <div class="result" id="listResult"></div>
+  </div>
+</div>
+
+<script>
+  const apiBase = document.getElementById('apiBase');
+  const adminKey = document.getElementById('adminKey');
+  const seedBtn = document.getElementById('seedBtn');
+  const seedResult = document.getElementById('seedResult');
+  const listBtn = document.getElementById('listBtn');
+  const listResult = document.getElementById('listResult');
+
+  function showResult(el, ok, text) {
+    el.className = 'result ' + (ok ? 'ok' : 'err');
+    el.textContent = text;
+  }
+
+  seedBtn.addEventListener('click', async () => {
+    const base = apiBase.value.trim().replace(/\/$/, '');
+    const key = adminKey.value.trim();
+    if (!base || !key) { showResult(seedResult, false, 'Fill in both fields first.'); return; }
+    seedBtn.disabled = true;
+    seedBtn.textContent = 'Loading…';
+    try {
+      const res = await fetch(`${base}/admin/seed`, {
+        method: 'POST',
+        headers: { 'X-Admin-Key': key }
+      });
+      const data = await res.json();
+      if (!res.ok) { showResult(seedResult, false, `Error ${res.status}: ${JSON.stringify(data, null, 2)}`); }
+      else { showResult(seedResult, true, JSON.stringify(data, null, 2)); }
+    } catch (err) {
+      showResult(seedResult, false, `Couldn't reach the backend: ${err.message}`);
+    } finally {
+      seedBtn.disabled = false;
+      seedBtn.textContent = 'Load the 3 sample documents';
+    }
+  });
+
+  listBtn.addEventListener('click', async () => {
+    const base = apiBase.value.trim().replace(/\/$/, '');
+    const key = adminKey.value.trim();
+    if (!base || !key) { showResult(listResult, false, 'Fill in both fields first.'); return; }
+    listBtn.disabled = true;
+    listBtn.textContent = 'Checking…';
+    try {
+      const res = await fetch(`${base}/admin/documents`, {
+        headers: { 'X-Admin-Key': key }
+      });
+      const data = await res.json();
+      if (!res.ok) { showResult(listResult, false, `Error ${res.status}: ${JSON.stringify(data, null, 2)}`); }
+      else { showResult(listResult, true, JSON.stringify(data, null, 2)); }
+    } catch (err) {
+      showResult(listResult, false, `Couldn't reach the backend: ${err.message}`);
+    } finally {
+      listBtn.disabled = false;
+      listBtn.textContent = 'List documents';
+    }
+  });
+</script>
+</body>
+</html>
