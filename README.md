@@ -1,4 +1,4 @@
-# logiQ — Custom AI agent with RAG for internal knowledge base
+# logiQ : Custom AI agent with RAG for internal knowledge base
 
 A chat app that answers questions from your company's SOPs, policies, and training docs, with cited sources. Frontend on Vercel, backend (FastAPI + Postgres/pgvector) on Render.
 
