@@ -26,6 +26,11 @@ def on_startup():
     # Idempotent: safe to run on every deploy/restart, never touches existing data.
     if settings.database_url:
         init_schema()
+        # Auto-seed the built-in sample docs the first time the KB is empty,
+        # so the app is immediately usable with zero manual setup steps.
+        for doc in SEED_DOCUMENTS:
+            if not document_exists(doc["title"]):
+                ingest_text(doc["title"], doc["doc_type"], doc["content"])
 
 
 def _check_admin_key(x_admin_key: str | None):
