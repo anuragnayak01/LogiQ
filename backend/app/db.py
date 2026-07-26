@@ -3,6 +3,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 import psycopg
+from pgvector import Vector
 from pgvector.psycopg import register_vector
 
 from app.config import get_settings
@@ -70,7 +71,7 @@ def insert_document(title: str, doc_type: str, source_path: str | None = None) -
 def insert_chunks(document_id: int, chunks: list[str], embeddings: list[list[float]]) -> None:
     with get_conn() as conn, conn.cursor() as cur:
         rows = [
-            (document_id, i, chunk, embedding)
+            (document_id, i, chunk, Vector(embedding))
             for i, (chunk, embedding) in enumerate(zip(chunks, embeddings))
         ]
         cur.executemany(
@@ -99,7 +100,7 @@ def search_chunks(query_embedding: list[float], top_k: int) -> list[dict]:
             ORDER BY c.embedding <=> %s
             LIMIT %s
             """,
-            (query_embedding, query_embedding, top_k),
+            (Vector(query_embedding), Vector(query_embedding), top_k),
         )
         cols = ["id", "content", "chunk_index", "title", "doc_type", "similarity"]
         return [dict(zip(cols, row)) for row in cur.fetchall()]
