@@ -66,7 +66,31 @@ class OpenAIProvider(LLMProvider):
         return completion.choices[0].message.content
 
 
+class GroqProvider(LLMProvider):
+    def __init__(self):
+        from openai import OpenAI
+
+        # Groq exposes an OpenAI-compatible chat completions API.
+        self.client = OpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1")
+
+    def answer(self, question: str, context: str) -> str:
+        completion = self.client.chat.completions.create(
+            model=settings.groq_model,
+            max_tokens=800,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": f"Document excerpts:\n\n{context}\n\nEmployee question: {question}",
+                },
+            ],
+        )
+        return completion.choices[0].message.content
+
+
 def get_llm_provider() -> LLMProvider:
     if settings.llm_provider == "openai":
         return OpenAIProvider()
+    if settings.llm_provider == "groq":
+        return GroqProvider()
     return ClaudeProvider()

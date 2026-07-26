@@ -12,15 +12,16 @@ CREATE TABLE IF NOT EXISTS kb_documents (
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Chunked + embedded content. Embedding dimension defaults to 1536
--- (OpenAI text-embedding-3-small). Change the dimension below if you
--- swap embedding providers/models.
+-- Chunked + embedded content. Embedding dimension defaults to 384
+-- (fastembed's BAAI/bge-small-en-v1.5, free local model, no API key needed).
+-- If you switch EMBEDDING_PROVIDER to "openai" in .env, change this to
+-- VECTOR(1536) instead (text-embedding-3-small's dimension) before re-ingesting.
 CREATE TABLE IF NOT EXISTS kb_chunks (
     id          SERIAL PRIMARY KEY,
     document_id INTEGER NOT NULL REFERENCES kb_documents(id) ON DELETE CASCADE,
     chunk_index INTEGER NOT NULL,
     content     TEXT NOT NULL,
-    embedding   VECTOR(1536) NOT NULL,
+    embedding   VECTOR(384) NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

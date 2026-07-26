@@ -6,18 +6,21 @@ class Settings:
     # --- Postgres ---
     database_url: str = os.getenv("DATABASE_URL", "")
 
-    # --- LLM provider: "claude" or "openai" ---
-    llm_provider: str = os.getenv("LLM_PROVIDER", "claude").lower()
+    # --- LLM provider: "claude", "openai", or "groq" ---
+    llm_provider: str = os.getenv("LLM_PROVIDER", "groq").lower()
     anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
     anthropic_model: str = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
     openai_chat_model: str = os.getenv("OPENAI_CHAT_MODEL", "gpt-4o-mini")
+    groq_api_key: str = os.getenv("GROQ_API_KEY", "")
+    groq_model: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
-    # --- Embeddings: only OpenAI's embedding endpoint is wired up here,
-    # since Anthropic doesn't currently offer a first-party embeddings API.
-    # If ANTHROPIC is the LLM provider, embeddings still use OpenAI.
-    embedding_model: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-    embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "1536"))
+    # --- Embeddings ---
+    # "fastembed" runs a small local model for free, no API key, no cost.
+    # "openai" uses OpenAI's embedding endpoint instead (costs money, higher quality).
+    embedding_provider: str = os.getenv("EMBEDDING_PROVIDER", "fastembed").lower()
+    embedding_model: str = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
+    embedding_dim: int = int(os.getenv("EMBEDDING_DIM", "384"))  # 384 for bge-small-en-v1.5
 
     # --- Retrieval ---
     top_k: int = int(os.getenv("RAG_TOP_K", "5"))
