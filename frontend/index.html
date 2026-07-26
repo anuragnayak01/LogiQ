@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Manifest — Internal Knowledge Base</title>
+<title>logiQ - Internal Knowledge Base</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -349,27 +349,27 @@
   }
   .msg.user .role-label { text-align: right; }
 
-  .manifest { display: flex; flex-direction: column; gap: 8px; max-width: 90%; padding-left: 35px; }
-  .manifest-tag {
+  .logiQ { display: flex; flex-direction: column; gap: 8px; max-width: 90%; padding-left: 35px; }
+  .logiQ-tag {
     display: flex; align-items: center; gap: 10px;
     padding: 10px 14px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
   }
-  .manifest-tag .icon-sm {
+  .logiQ-tag .icon-sm {
     width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
   }
-  .manifest-tag .icon-sm.sop { background: var(--mint); color: var(--mint-ink); }
-  .manifest-tag .icon-sm.policy { background: var(--lav); color: var(--lav-ink); }
-  .manifest-tag .icon-sm.training { background: var(--blue); color: var(--blue-ink); }
-  .manifest-tag .icon-sm svg { width: 13px; height: 13px; }
-  .manifest-tag .title {
+  .logiQ-tag .icon-sm.sop { background: var(--mint); color: var(--mint-ink); }
+  .logiQ-tag .icon-sm.policy { background: var(--lav); color: var(--lav-ink); }
+  .logiQ-tag .icon-sm.training { background: var(--blue); color: var(--blue-ink); }
+  .logiQ-tag .icon-sm svg { width: 13px; height: 13px; }
+  .logiQ-tag .title {
     font-size: 13px; font-weight: 600; flex: 1;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .manifest-tag .match {
+  .logiQ-tag .match {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; color: var(--ink-muted); flex-shrink: 0;
   }
@@ -424,7 +424,7 @@
       </svg>
     </span>
     <div class="brand-text">
-      <span class="brand-mark">Manifest</span>
+      <span class="brand-mark">logiQ</span>
       <span class="brand-sub">Knowledge Base</span>
     </div>
   </div>
@@ -445,7 +445,7 @@
     <div class="eyebrow">
       <span class="seg1">Knowledge Base</span>
       <span class="rule"></span>
-      <span class="seg2">Manifest</span>
+      <span class="seg2">logiQ</span>
     </div>
     <h1 class="headline">
       Get the <span class="accent-wrap"><span class="accent">straight answer</span>
@@ -512,7 +512,7 @@
 <div class="chat-shell" id="chatSection">
   <div class="chat-card">
     <div class="chat-card-head">
-      <span class="label"><span class="dot"></span>Ask Manifest</span>
+      <span class="label"><span class="dot"></span>Ask logiQ</span>
       <div class="status">
         <span class="status-dot" id="statusDot"></span>
         <span id="statusText">connecting…</span>
@@ -540,7 +540,7 @@
 
 <script>
   // Point this at your deployed FastAPI backend (Render, Fly.io, etc.)
-  const API_BASE_URL = window.MANIFEST_API_BASE_URL || "http://localhost:8000";
+  const API_BASE_URL = window.logiQ_API_BASE_URL || "http://localhost:8000";
 
   const thread = document.getElementById('thread');
   const form = document.getElementById('chatForm');
@@ -569,7 +569,7 @@
 
     const label = document.createElement('div');
     label.className = 'role-label';
-    label.textContent = role === 'user' ? 'You' : 'Manifest';
+    label.textContent = role === 'user' ? 'You' : 'logiQ';
 
     const row = document.createElement('div');
     row.className = 'bubble-row';
@@ -600,10 +600,10 @@
   function addSources(sources) {
     if (!sources || sources.length === 0) return;
     const wrap = document.createElement('div');
-    wrap.className = 'manifest';
+    wrap.className = 'logiQ';
     sources.forEach(s => {
       const tag = document.createElement('div');
-      tag.className = 'manifest-tag';
+      tag.className = 'logiQ-tag';
 
       const icon = document.createElement('span');
       icon.className = `icon-sm ${s.doc_type}`;
