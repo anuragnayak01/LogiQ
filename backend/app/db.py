@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 import psycopg
-from pgvector import Vector
+from pgvector.utils import Vector
 from pgvector.psycopg import register_vector
 
 from app.config import get_settings
