@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manifest — Internal Knowledge Base</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #10161c;
+    --surface: #161f28;
+    --surface-2: #1c2733;
+    --border: #29343f;
+    --text: #edf1f5;
+    --text-muted: #8a9cad;
+    --accent: #e8a33d;
+    --accent-dim: #7a5a28;
+    --verified: #4fc1b0;
+    --radius: 6px;
+  }
+
+  * { box-sizing: border-box; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    background-image:
+      linear-gradient(var(--bg), var(--bg)),
+      repeating-linear-gradient(135deg, rgba(232,163,61,0.025) 0px, rgba(232,163,61,0.025) 1px, transparent 1px, transparent 14px);
+    background-blend-mode: normal;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .brand-mark {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: 0.02em;
+  }
+
+  .brand-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-left: 1px solid var(--border);
+    padding-left: 10px;
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+  .status-dot.online { background: var(--verified); box-shadow: 0 0 6px var(--verified); }
+  .status-dot.offline { background: #d9534f; }
+
+  main {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .thread {
+    width: 100%;
+    max-width: 720px;
+    padding: 28px 20px 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .intro {
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .intro-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .intro h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    margin: 0 0 8px;
+  }
+
+  .intro p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .chip:hover, .chip:focus-visible { border-color: var(--accent); color: var(--text); outline: none; }
+
+  .msg { display: flex; flex-direction: column; gap: 6px; }
+  .msg.user { align-items: flex-end; }
+  .msg.agent { align-items: flex-start; }
+
+  .bubble {
+    max-width: 88%;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .msg.user .bubble {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+  .msg.agent .bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent);
+  }
+
+  .role-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0 4px;
+  }
+
+  /* Manifest stub — signature element for source citations */
+  .manifest {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+    max-width: 88%;
+  }
+
+  .manifest-tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+  }
+
+  .manifest-tag .doctype {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .doctype.sop { background: rgba(232,163,61,0.15); color: var(--accent); }
+  .doctype.policy { background: rgba(79,193,176,0.15); color: var(--verified); }
+  .doctype.training { background: rgba(140,150,220,0.15); color: #9aa5e0; }
+
+  .manifest-tag .title { color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .manifest-tag .match { color: var(--text-muted); flex-shrink: 0; }
+
+  .typing { display: flex; gap: 4px; padding: 14px 16px; }
+  .typing span {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text-muted);
+    animation: pulse 1.1s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
+
+  footer {
+    position: sticky;
+    bottom: 0;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 16px 20px 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  form {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    gap: 10px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 13px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+  }
+  input[type="text"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  input[type="text"]::placeholder { color: var(--text-muted); }
+
+  button {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    background: var(--accent);
+    color: #1a1305;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0 22px;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  button:hover, button:focus-visible { filter: brightness(1.1); outline: none; }
+  button:disabled { background: var(--accent-dim); cursor: not-allowed; color: rgba(255,255,255,0.4); }
+
+  @media (max-width: 600px) {
+    header { padding: 14px 16px; }
+    .brand-sub { display: none; }
+    .thread { padding: 20px 14px 110px; }
+    footer { padding: 12px 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-mark">MANIFEST</span>
+    <span class="brand-sub">Internal Knowledge Base</span>
+  </div>
+  <div class="status">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">connecting…</span>
+  </div>
+</header>
+
+<main>
+  <div class="thread" id="thread">
+    <div class="intro">
+      <div class="intro-eyebrow">Ask before you act</div>
+      <h1>Ask about SOPs, policies, or training</h1>
+      <p>Answers are pulled directly from indexed company documents — receiving procedures, HR policy, safety training. Every answer cites its source.</p>
+      <div class="chips">
+        <button class="chip" type="button">What's the pre-shift forklift checklist?</button>
+        <button class="chip" type="button">How much PTO can I roll over?</button>
+        <button class="chip" type="button">What do I do if a shipment seal doesn't match the BOL?</button>
+        <button class="chip" type="button">How many attendance points trigger a written warning?</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <form id="chatForm">
+    <input type="text" id="questionInput" placeholder="Ask a question about company SOPs, policy, or training…" autocomplete="off" />
+    <button type="submit" id="sendBtn">Ask</button>
+  </form>
+</footer>
+
+<script>
+  // Point this at your deployed FastAPI backend (Render, Fly.io, etc.)
+  const API_BASE_URL = window.MANIFEST_API_BASE_URL || "http://localhost:8000";
+
+  const thread = document.getElementById('thread');
+  const form = document.getElementById('chatForm');
+  const input = document.getElementById('questionInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const sessionId = 'demo-' + Math.random().toString(36).slice(2, 10);
+
+  async function checkHealth() {
+    try {
+      const res = await fetch(`${API_BASE_URL}/health`);
+      const data = await res.json();
+      statusDot.classList.add('online');
+      statusText.textContent = `live · ${data.llm_provider}`;
+    } catch (e) {
+      statusDot.classList.add('offline');
+      statusText.textContent = 'backend offline';
+    }
+  }
+  checkHealth();
+
+  function addMessage(role, text) {
+    const msg = document.createElement('div');
+    msg.className = `msg ${role}`;
+    const label = document.createElement('div');
+    label.className = 'role-label';
+    label.textContent = role === 'user' ? 'You' : 'Manifest';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    msg.appendChild(label);
+    msg.appendChild(bubble);
+    thread.appendChild(msg);
+    thread.scrollTop = thread.scrollHeight;
+    return msg;
+  }
+
+  function addSources(sources) {
+    if (!sources || sources.length === 0) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'manifest';
+    sources.forEach(s => {
+      const tag = document.createElement('div');
+      tag.className = 'manifest-tag';
+      const type = document.createElement('span');
+      type.className = `doctype ${s.doc_type}`;
+      type.textContent = s.doc_type;
+      const title = document.createElement('span');
+      title.className = 'title';
+      title.textContent = s.title.replace(/_/g, ' ');
+      const match = document.createElement('span');
+      match.className = 'match';
+      match.textContent = `${Math.round(s.similarity * 100)}% match`;
+      tag.appendChild(type);
+      tag.appendChild(title);
+      tag.appendChild(match);
+      wrap.appendChild(tag);
+    });
+    thread.appendChild(wrap);
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  function addTyping() {
+    const msg = document.createElement('div');
+    msg.className = 'msg agent';
+    msg.id = 'typingIndicator';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble typing';
+    bubble.innerHTML = '<span></span><span></span><span></span>';
+    msg.appendChild(bubble);
+    thread.appendChild(msg);
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  async function ask(question) {
+    addMessage('user', question);
+    input.value = '';
+    sendBtn.disabled = true;
+    addTyping();
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, session_id: sessionId })
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      const data = await res.json();
+      removeTyping();
+      addMessage('agent', data.answer);
+      addSources(data.sources);
+    } catch (err) {
+      removeTyping();
+      addMessage('agent', "Couldn't reach the knowledge base backend. Check that the API is running and CORS is configured for this origin.");
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q) return;
+    ask(q);
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => ask(chip.textContent));
+  });
+</script>
+
+</body>
+</html>
